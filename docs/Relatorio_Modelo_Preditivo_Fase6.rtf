@@ -1,0 +1,84 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2870
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fnil\fcharset0 LucidaGrande;
+\f3\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww29200\viewh18460\viewkind0
+\deftab720
+\pard\pardeftab720\sa321\partightenfactor0
+
+\f0\b\fs48 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Relat\'f3rio T\'e9cnico \'97 CardioIA: Modelo Preditivo de Risco\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\fs36 \cf0 1. Desenvolvimento e escolha do modelo\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 O objetivo deste trabalho foi desenvolver um modelo de aprendizado de m\'e1quina capaz de classificar situa\'e7\'f5es de pico de risco a partir de dados sint\'e9ticos. Para isso, foi criada uma base com 5.000 registros e dez vari\'e1veis de entrada, incluindo idade m\'e9dia, frequ\'eancia card\'edaca, satura\'e7\'e3o de oxig\'eanio (SpO
+\f2 \uc0\u8322 
+\f1 ), press\'e3o arterial sist\'f3lica, tempo de espera e disponibilidade de recursos. A classifica\'e7\'e3o final, representada pela vari\'e1vel 
+\f3\fs26 pico_risco
+\f1\fs24 , foi definida por regras previamente estabelecidas, separando os registros em duas classes: 0 (sem pico de risco) e 1 (com pico de risco).\
+A base foi dividida em 80% para treinamento e 20% para teste. Essa separa\'e7\'e3o permitiu avaliar o desempenho dos modelos em registros que n\'e3o foram utilizados durante o treinamento. Foram comparados tr\'eas algoritmos: Regress\'e3o Log\'edstica, Random Forest e Gradient Boosting. O Random Forest foi escolhido por apresentar os melhores resultados gerais. Como utiliza v\'e1rias \'e1rvores de decis\'e3o, esse algoritmo consegue identificar diferentes combina\'e7\'f5es de vari\'e1veis e representar rela\'e7\'f5es que nem sempre s\'e3o lineares.\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 2. Resultados e an\'e1lise das m\'e9tricas\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 O Random Forest apresentou acur\'e1cia de 99,9%, precis\'e3o de 100%, recall de aproximadamente 99,62% e F1-score de aproximadamente 99,81%. A acur\'e1cia indica a propor\'e7\'e3o de classifica\'e7\'f5es corretas; a precis\'e3o mostra quantas das previs\'f5es positivas estavam corretas; o recall mede quantos dos casos positivos existentes foram identificados; e o F1-score considera o equil\'edbrio entre precis\'e3o e recall. O recall \'e9 especialmente importante neste contexto, pois erros ao deixar de identificar um caso positivo merecem aten\'e7\'e3o.\
+A matriz de confus\'e3o apresentou os seguintes resultados:\
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth620\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2880
+\clvertalc \clshdrawnil \clwWidth1015\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5760
+\clvertalc \clshdrawnil \clwWidth1015\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+
+\f0\b \cf0 \strokec2 \cell 
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+\cf0 Previsto 0\cell 
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+\cf0 Previsto 1\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth620\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2880
+\clvertalc \clshdrawnil \clwWidth1015\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5760
+\clvertalc \clshdrawnil \clwWidth1015\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\b0 \cf0 Real 0\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 734\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 0\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth620\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2880
+\clvertalc \clshdrawnil \clwWidth1015\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx5760
+\clvertalc \clshdrawnil \clwWidth1015\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Real 1\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 1\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 265\cell \lastrow\row
+\pard\pardeftab720\sa240\partightenfactor0
+\cf0 \strokec2 Dos 1.000 registros de teste, 999 foram classificados corretamente. O modelo identificou 734 casos da classe 0 e 265 da classe 1. N\'e3o houve falsos positivos, mas um caso positivo foi classificado incorretamente como negativo. Esse falso negativo mostra que, mesmo com m\'e9tricas elevadas, \'e9 necess\'e1rio analisar os tipos de erro, principalmente quando uma classifica\'e7\'e3o incorreta pode ter consequ\'eancias importantes.\
+Tamb\'e9m foi calculado o Brier Score, com resultado de 0,0058, e analisada a curva de calibra\'e7\'e3o. O Brier Score avalia a diferen\'e7a entre as probabilidades estimadas e os resultados observados, sendo que valores menores indicam menor erro probabil\'edstico. Esses resultados s\'e3o favor\'e1veis no conjunto de teste utilizado, mas n\'e3o comprovam que as probabilidades estejam calibradas para situa\'e7\'f5es reais.\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 3. Limita\'e7\'f5es e melhorias futuras\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 A principal limita\'e7\'e3o do experimento \'e9 o uso de dados sint\'e9ticos. Como os registros e as classifica\'e7\'f5es foram gerados por regras predefinidas, o modelo aprendeu padr\'f5es presentes nessas pr\'f3prias regras. Isso ajuda a explicar o desempenho elevado, mas n\'e3o demonstra que ele consiga prever eventos card\'edacos reais com a mesma precis\'e3o. Portanto, o score produzido pelo modelo n\'e3o deve ser interpretado como uma probabilidade cl\'ednica validada.\
+Como pr\'f3ximos passos, seria importante avaliar o modelo com dados reais anonimizados e obtidos com as devidas autoriza\'e7\'f5es, realizar valida\'e7\'e3o externa e investigar os casos classificados incorretamente. Tamb\'e9m seria necess\'e1rio acompanhar as m\'e9tricas e a calibra\'e7\'e3o em diferentes conjuntos de dados, verificando se o desempenho se mant\'e9m.\
+\pard\pardeftab720\sa298\partightenfactor0
+
+\f0\b\fs36 \cf0 4. Teste e conclus\'e3o\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf0 Ap\'f3s o treinamento, o modelo foi salvo no arquivo 
+\f3\fs26 modelo_risco_cardiaco.joblib
+\f1\fs24  e testado com um novo caso sint\'e9tico. O resultado foi classe prevista 1, com score estimado de 0,96 (96%). Esse teste confirmou que o modelo conseguiu receber novos dados e gerar uma previs\'e3o. No entanto, o resultado representa uma estimativa do modelo dentro do cen\'e1rio simulado, e n\'e3o uma avalia\'e7\'e3o cl\'ednica real.\
+A base de conhecimento tamb\'e9m foi organizada com os dez protocolos fornecidos no enunciado, preparando-os para uso posterior na arquitetura multiagente. Dessa forma, foi poss\'edvel concluir as etapas de gera\'e7\'e3o de dados, treinamento, compara\'e7\'e3o dos algoritmos, avalia\'e7\'e3o das m\'e9tricas, salvamento e teste do modelo. Apesar dos resultados positivos, sua aplica\'e7\'e3o em situa\'e7\'f5es reais dependeria de valida\'e7\'e3o adicional e de uma avalia\'e7\'e3o cuidadosa de sua seguran\'e7a e confiabilidade.\
+}
