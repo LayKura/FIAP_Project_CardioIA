@@ -9,3 +9,8 @@ flask
 flask-cors
 python-dotenv
 requests
+joblib
+pydantic
+openai
+openai-agents
+fpdf2
