@@ -14,18 +14,53 @@ cls
 echo =======================================================
 echo          CARDIOIA - MENU PRINCIPAL
 echo =======================================================
-echo [1] Iniciar Chatbot Conversacional (Fase 5 - Flask & Web)
-echo [2] Iniciar Prototipo de Diagnostico ECG (Fase 4 - Streamlit)
-echo [3] Executar Testes Automatizados da API (Fase 5)
-echo [4] Sair
+echo [1] Executar Sistema Multiagente Preditivo (Fase 6 - OpenAI Agents SDK)
+echo [2] Executar Testes Automatizados do Multiagente (Fase 6)
+echo [3] Iniciar Chatbot Conversacional (Fase 5 - Flask ^& Web)
+echo [4] Executar Testes Automatizados da API (Fase 5)
+echo [5] Iniciar Prototipo de Diagnostico ECG (Fase 4 - Streamlit)
+echo [6] Sair
 echo =======================================================
-set /p OPT="Escolha uma opcao (1-4): "
+set /p OPT="Escolha uma opcao (1-6): "
 
-if "%OPT%"=="1" goto CHATBOT
-if "%OPT%"=="2" goto STREAMLIT
-if "%OPT%"=="3" goto TESTES
-if "%OPT%"=="4" goto FIM
+if "%OPT%"=="1" goto MULTIAGENTE
+if "%OPT%"=="2" goto TESTES_FASE6
+if "%OPT%"=="3" goto CHATBOT
+if "%OPT%"=="4" goto TESTES_FASE5
+if "%OPT%"=="5" goto STREAMLIT
+if "%OPT%"=="6" goto FIM
 echo Opcao invalida! Tente novamente.
+pause
+cls
+goto MENU
+
+:MULTIAGENTE
+cls
+echo =======================================================
+echo Executando Sistema Multiagente CardioIA (Fase 6)...
+echo =======================================================
+echo [1] Cenario Oficial FIAP (novo_caso - Risco Alto 0.96)
+echo [2] Cenario Normalidade (Baixo Risco)
+echo [3] Cenario Colapso Hospitalar (Risco Critico)
+echo =======================================================
+set /p CEN="Escolha o cenario (1-3, Enter para 1): "
+if "%CEN%"=="2" (
+    python scripts/sistema_multiagente_fase6.py --cenario baixo_risco
+) else if "%CEN%"=="3" (
+    python scripts/sistema_multiagente_fase6.py --cenario critico
+) else (
+    python scripts/sistema_multiagente_fase6.py --cenario padrao
+)
+pause
+cls
+goto MENU
+
+:TESTES_FASE6
+cls
+echo =======================================================
+echo Executando Bateria de Testes do Sistema Multiagente (Fase 6)...
+echo =======================================================
+python scripts/test_multiagente_fase6.py
 pause
 cls
 goto MENU
@@ -52,10 +87,10 @@ pause
 cls
 goto MENU
 
-:TESTES
+:TESTES_FASE5
 cls
 echo =======================================================
-echo Executando Bateria de Testes Automatizados...
+echo Executando Bateria de Testes Automatizados (Fase 5)...
 echo =======================================================
 python scripts/test_watson_api.py
 pause
@@ -64,3 +99,4 @@ goto MENU
 
 :FIM
 exit
+

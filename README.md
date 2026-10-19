@@ -17,14 +17,14 @@ Caique Nonato da Silva Bezerra
 
 # Organização do projeto
 
-* **config:** Centraliza arquivos de configuração, mapeamento de sintomas (.csv), dicionários de regras, diagramas, os pesos dos modelos CNN salvos (`.pth`) e a exportação do Watson Assistant (`watson_assistant_skill.json`).
-* **docs:** Reservada para a base de conhecimento textual e documentação técnica, incluindo relatórios do ESP32, Node-RED e Watson Assistant.
-* **scripts:** Contém os notebooks (.ipynb), script de treinamento CNN (`cardioia_treinamento_cnn.py`), protótipo Streamlit (`cardioia_prototype.py`), código C++ do ESP32 (`skecth_esp32.ino`), serviço do Watson (`watson_service.py`), backend Flask (`app.py`) e suíte de testes (`test_watson_api.py`).
+* **config:** Centraliza arquivos de configuração, mapeamento de sintomas (.csv), dicionários de regras, diagramas, os pesos dos modelos CNN salvos (`.pth`), a exportação do Watson Assistant (`watson_assistant_skill.json`), o modelo preditivo de risco cardíaco da Fase 6 (`modelo_risco_cardiaco.joblib`) e os protocolos clínicos de emergência (`protocolos_emergencia.json`).
+* **docs:** Reservada para a base de conhecimento textual e documentação técnica, incluindo relatórios do ESP32, Node-RED, Watson Assistant, Relatório do Modelo Preditivo da Fase 6 (`Relatorio_Modelo_Preditivo_Fase6.pdf` / `.rtf`) e Arquitetura Multiagente (`Arquitetura_Multiagente_Fase6.pdf`).
+* **scripts:** Contém os notebooks (.ipynb), script de treinamento CNN (`cardioia_treinamento_cnn.py`), protótipo Streamlit (`cardioia_prototype.py`), código C++ do ESP32 (`skecth_esp32.ino`), serviço do Watson (`watson_service.py`), backend Flask (`app.py`), sistema multiagente preditivo (`sistema_multiagente_fase6.py`) e suítes de testes (`test_watson_api.py` e `test_multiagente_fase6.py`).
 * **templates / static:** Interface web moderna de interação com o assistente conversacional.
 * **temp:** Diretório destinado a arquivos gerados durante a execução, logs de processamento e tabelas de testes temporárias.
-* **assets:** Armazena os ativos do projeto, dados cardiologia (`heart.csv`), exames de ECG e imagens de dashboards.
+* **assets:** Armazena os ativos do projeto, dados cardiologia (`heart.csv`), base sintética de 5.000 casos (`base_sintetica_risco_fase6.csv`), exames de ECG e imagens de dashboards.
 * **requirements.txt:** Listagem de todas as bibliotecas Python necessárias para execução do ecossistema.
-* **main.bat:** Script inicializador automatizado interativo para Windows com menu de opções para a Fase 4 e Fase 5.
+* **main.bat:** Script inicializador automatizado interativo para Windows com menu de opções para as Fases 4, 5 e 6.
 
 ---  
 
@@ -277,4 +277,106 @@ python scripts/test_watson_api.py
    ```powershell
    pip install -r requirements.txt
    python scripts/app.py
+   ```
+
+---
+
+## 🫀 Fase 6: Coração Sob Controle – Gestão de Crises com Sistema Preditivo e Arquitetura Multiagente
+
+Na **Fase 6**, o projeto **CardioIA** atinge maturidade de comando hospitalar ao integrar **Ciência de Dados Preditiva (Machine Learning)** a uma **Arquitetura Multiagente Autônoma (OpenAI Agents SDK)** para prever picos de risco cardiovascular e acionar protocolos clínicos de contingência de maneira estruturada e auditável.
+
+### 👥 Divisão de Atividades (Fase 6)
+* **Lais Kurahashi (Parte 1 – Modelo Preditivo e Protocolos):** Geração da base sintética com 5.000 cenários hospitalares, treinamento e comparação de modelos supervisionados (Regressão Logística, Gradient Boosting e Random Forest), avaliação de métricas e calibração (Brier Score), serialização do modelo `.joblib`, estruturação dos 10 protocolos de emergência (`.json`) e elaboração do Relatório Técnico do Modelo Preditivo (2 páginas).
+* **Davi Santos Ferreira (Parte 2 – Arquitetura Multiagente, Automação e Governança):** Desenvolvimento do Sistema Multiagente com **OpenAI Agents SDK** (4 agentes especializados, *tools*, *handoffs*, histórico de mensagens e validação Pydantic), documento de Arquitetura Multiagente em PDF (3 páginas), suíte de testes automatizados (`test_multiagente_fase6.py`), menu interativo (`main.bat`) e documentação técnica.
+
+---
+
+### 📊 Parte 1: Modelo Preditivo de Risco Cardíaco (`RandomForestClassifier`)
+
+A base sintética ([`assets/base_sintetica_risco_fase6.csv`](./assets/base_sintetica_risco_fase6.csv)) possui **5.000 registros** e **10 variáveis preditivas** (`idade_media`, `carga_sistema`, `tempo_espera`, `fc_media`, `spo2_media`, `pa_sistolica`, `temperatura`, `densidade_eventos`, `eventos_24h`, `disponibilidade_recursos`) para estimar a variável-alvo `pico_risco` (`0 = Normal`, `1 = Alerta Crítico`).
+
+| Modelo Avaliado | Acurácia | Precisão | Recall (Sensibilidade) | F1-Score | Brier Score |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Random Forest (Escolhido)** | **0.9990** | **1.0000** | **0.9962** | **0.9981** | **0.0058** |
+| Gradient Boosting | 0.9980 | 0.9962 | 0.9962 | 0.9962 | 0.0019 |
+| Regressão Logística | 0.8160 | 0.6146 | 0.8233 | 0.7038 | 0.1232 |
+
+* **Artefatos da Parte 1:**
+  * Notebook de Treinamento: [`scripts/CardioIA_Modelo_Preditivo_Fase6.ipynb`](./scripts/CardioIA_Modelo_Preditivo_Fase6.ipynb)
+  * Modelo Serializado: [`config/modelo_risco_cardiaco.joblib`](./config/modelo_risco_cardiaco.joblib)
+  * Protocolos de Emergência (10 regras): [`config/protocolos_emergencia.json`](./config/protocolos_emergencia.json)
+  * Relatório Técnico (2 páginas): [`docs/Relatorio_Modelo_Preditivo_Fase6.pdf`](./docs/Relatorio_Modelo_Preditivo_Fase6.pdf) / [`docs/Relatorio_Modelo_Preditivo_Fase6.rtf`](./docs/Relatorio_Modelo_Preditivo_Fase6.rtf)
+
+---
+
+### 🤖 Parte 2: Arquitetura Multiagente (`OpenAI Agents SDK`)
+
+Implementada em [`scripts/sistema_multiagente_fase6.py`](./scripts/sistema_multiagente_fase6.py), a arquitetura coordena **4 agentes especializados** conectados via **Handoffs**, **Tools** e **Validação Pydantic (`output_type=RecomendacaoFinalCardioIA`)**:
+
+```mermaid
+flowchart LR
+    Input["Cenário Hospitalar (novo_caso)"] --> A1["1. Agente Orquestrador"]
+    A1 -- "Handoff #1" --> A2["2. Agente Analista de Risco"]
+    A2 <--> T1[("Tool: consultar_modelo_risco\n(modelo_risco_cardiaco.joblib)")]
+    A2 -- "Handoff #2" --> A3["3. Agente Especialista em Protocolos"]
+    A3 <--> T2[("Tool: consultar_protocolos_emergencia\n(protocolos_emergencia.json)")]
+    A3 -- "Handoff #3" --> A4["4. Agente Planejador de Resposta"]
+    A4 --> Out["Saída Validada (Pydantic)\nRisco + Protocolos + Justificativa"]
+```
+
+1. **Agente Orquestrador:** Recebe o cenário hospitalar, normaliza chaves de entrada (tratando automaticamente variações como `"disponibilidade recursos"` com espaço para `"disponibilidade_recursos"`), inicializa o histórico de mensagens e transfere o controle ao Analista de Risco.
+2. **Agente Analista de Risco:** Executa a *tool* `consultar_modelo_risco` sob o modelo `.joblib`, obtendo a classe prevista (`pico_risco`) e a probabilidade (`score_risco`), classifica a severidade (`BAIXO`, `MODERADO` ou `ALTO`) e realiza *handoff* para o Especialista em Protocolos.
+3. **Agente Especialista em Protocolos:** Executa a *tool* `consultar_protocolos_emergencia` sob os 10 protocolos oficiais em `.json`, cruzando os indicadores vitais/operacionais e o score de risco, e realiza *handoff* para o Planejador de Resposta.
+4. **Agente Planejador de Resposta:** Consolida o plano de contingência final validado pelo schema Pydantic `RecomendacaoFinalCardioIA`.
+
+* **Documento de Arquitetura Multiagente (3 páginas):** [`docs/Arquitetura_Multiagente_Fase6.pdf`](./docs/Arquitetura_Multiagente_Fase6.pdf)
+
+---
+
+### 📋 Exemplo Real de Entrada e Saída (`novo_caso` Oficial FIAP)
+
+**Entrada (`novo_caso`):**
+```python
+novo_caso = {
+    "idade_media": 62, "carga_sistema": 92, "tempo_espera": 75,
+    "fc_media": 118, "spo2_media": 89, "pa_sistolica": 100,
+    "temperatura": 37.5, "densidade_eventos": 7, "eventos_24h": 5,
+    "disponibilidade_recursos": 25
+}
+```
+
+**Saída Estruturada Gerada pelo Sistema Multiagente:**
+```text
+Risco previsto: ALTO (score: 0.96)
+Ações recomendadas:
+- Se carga do sistema > 85% → abrir unidades temporárias
+- Se disponibilidade_recursos < 30% → redistribuir insumos
+- Se densidade_eventos > 6 → ativar plano de contingência
+- Se risco sistêmico alto → ativar estado de emergência
+Justificativa:
+O modelo Random Forest previu classe pico_risco=1 com probabilidade estimada de 0.96 (96%), caracterizando estado de ALERTA CRÍTICO hospitalar. Os indicadores operacionais demonstram sobrecarga severa da rede (carga do sistema em 92% > 85%, disponibilidade de recursos reduzida a 25% < 30% e densidade de eventos em 7 > 6), combinada a estresse fisiológico relevante dos pacientes monitorados (FC média de 118 bpm, SpO2 média de 89% e tempo de espera de 75 min). Diante dessa convergência, 4 protocolos oficiais de contingência foram acionados simultaneamente para abertura imediata de unidades temporárias, redistribuição de insumos críticos e decretação de estado de emergência.
+```
+
+---
+
+### 🚀 Como Executar e Testar a Fase 6
+
+1. **Pelo Menu Interativo (`main.bat`):**
+   ```powershell
+   .\main.bat
+   ```
+   * Escolha `[1]` para executar o **Sistema Multiagente Preditivo** (permite testar o Cenário Oficial FIAP, Baixo Risco ou Colapso Crítico).
+   * Escolha `[2]` para rodar a **Bateria de Testes Automatizados da Fase 6**.
+
+2. **Pelo Terminal (Linha de Comando):**
+   ```powershell
+   # Executar o fluxo multiagente completo no caso oficial da FIAP
+   python scripts/sistema_multiagente_fase6.py --cenario padrao
+
+   # Testar outros cenários (baixo_risco ou critico) ou exportar JSON completo
+   python scripts/sistema_multiagente_fase6.py --cenario baixo_risco
+   python scripts/sistema_multiagente_fase6.py --cenario critico --json
+
+   # Executar os 7 testes automatizados de validação da Fase 6
+   python scripts/test_multiagente_fase6.py
    ```

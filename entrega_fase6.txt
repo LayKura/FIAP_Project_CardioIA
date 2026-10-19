@@ -1,0 +1,35 @@
+=====================================================================
+FIAP - 2TIAOA - FASE 6: CORAÇÃO SOB CONTROLE
+PROJETO CARDIOIA - GESTÃO DE CRISES COM SISTEMA PREDITIVO EM IA
+=====================================================================
+
+INTEGRANTES DO GRUPO:
+- Davi Santos Ferreira
+- Lais Kurahashi
+
+---------------------------------------------------------------------
+1. REPOSITÓRIO GITHUB (CÓDIGO-FONTE, MODELO, MULTIAGENTE E DOCS)
+---------------------------------------------------------------------
+Link do Repositório GitHub:
+https://github.com/DaviFerreira/Cardio-IA
+(Nota: Substitua pela URL exata do repositório remoto caso diferente)
+
+Principais Entregáveis no Repositório:
+- Parte 1 (Modelo Preditivo e Protocolos):
+  * Notebook de Treinamento: scripts/CardioIA_Modelo_Preditivo_Fase6.ipynb
+  * Modelo Serializado (.joblib): config/modelo_risco_cardiaco.joblib
+  * Base Sintética (5.000 casos): assets/base_sintetica_risco_fase6.csv
+  * Protocolos de Emergência (10 regras): config/protocolos_emergencia.json
+  * Relatório Técnico do Modelo (2 páginas): docs/Relatorio_Modelo_Preditivo_Fase6.pdf (e .rtf)
+
+- Parte 2 (Sistema Multiagente com OpenAI Agents SDK):
+  * Sistema Multiagente (4 Agentes, Handoffs, Tools, Pydantic): scripts/sistema_multiagente_fase6.py
+  * Suíte de Testes Automatizados (7 testes): scripts/test_multiagente_fase6.py
+  * Documento de Arquitetura Multiagente (3 páginas): docs/Arquitetura_Multiagente_Fase6.pdf
+  * Menu Interativo de Execução: main.bat
+
+---------------------------------------------------------------------
+2. LINK DO VÍDEO DE DEMONSTRAÇÃO (YOUTUBE - NÃO LISTADO - ATÉ 4 MIN)
+---------------------------------------------------------------------
+Link do Vídeo no YouTube:
+[INSERIR_LINK_DO_VIDEO_YOUTUBE_NAO_LISTADO_AQUI]
