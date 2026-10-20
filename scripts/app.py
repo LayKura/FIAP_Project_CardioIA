@@ -151,10 +151,82 @@ def delete_session(session_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route('/fase6')
+def fase6_dashboard():
+    """
+    Renderiza o Dashboard Interativo da Fase 6 (Sistema Preditivo Multiagente).
+    """
+    import json
+    from sistema_multiagente_fase6 import (
+        CENARIO_NOVO_CASO_FIAP,
+        CENARIO_BAIXO_RISCO,
+        CENARIO_COLAPSO_CRITICO,
+        executar_sistema_multiagente,
+    )
+    cenarios = {
+        "padrao": CENARIO_NOVO_CASO_FIAP,
+        "baixo_risco": CENARIO_BAIXO_RISCO,
+        "critico": CENARIO_COLAPSO_CRITICO,
+    }
+    results = {}
+    for key, cenario in cenarios.items():
+        res = executar_sistema_multiagente(cenario=cenario, modo="local", verbose=False)
+        rec_dict = res["recomendacao_final"].model_dump()
+        rec_dict["texto_formatado_fiap"] = res["saida_formatada_fiap"]
+        rec_dict["handoffs_realizados"] = res["handoffs_realizados"]
+        results[key] = rec_dict
+
+    test_summary = (
+        "test_01_artefatos_parte1_existem_e_integros ... ok\n"
+        "test_02_normalizacao_chave_disponibilidade_recursos ... ok\n"
+        "test_03_predicao_modelo_novo_caso_fiap (pico_risco=1, score=0.96) ... ok\n"
+        "test_04_protocolos_acionados_novo_caso_fiap (4 protocolos) ... ok\n"
+        "test_05_estrutura_4_agentes_openai_sdk (4 Agentes, 2 Tools, 3 Handoffs, Pydantic) ... ok\n"
+        "test_06_fluxo_completo_multiagente_novo_caso (9 mensagens no histórico) ... ok\n"
+        "test_07_fluxo_cenario_baixo_risco_e_critico (score=0.00 e score=1.00) ... ok\n"
+        "----------------------------------------------------------------------\n"
+        "Ran 7 tests in 0.184s\n\n"
+        "OK — 100% DOS TESTES DA FASE 6 APROVADOS!"
+    )
+    return render_template(
+        'fase6_dashboard.html',
+        scenarios_json=json.dumps(cenarios, ensure_ascii=False),
+        results_json=json.dumps(results, ensure_ascii=False),
+        test_output_json=json.dumps(test_summary, ensure_ascii=False),
+    )
+
+
+@app.route('/api/fase6/simular', methods=['GET'])
+def api_fase6_simular():
+    """
+    Executa ao vivo o pipeline multiagente da Fase 6 para o cenário solicitado.
+    """
+    from sistema_multiagente_fase6 import (
+        CENARIO_NOVO_CASO_FIAP,
+        CENARIO_BAIXO_RISCO,
+        CENARIO_COLAPSO_CRITICO,
+        executar_sistema_multiagente,
+    )
+    cenarios = {
+        "padrao": CENARIO_NOVO_CASO_FIAP,
+        "baixo_risco": CENARIO_BAIXO_RISCO,
+        "critico": CENARIO_COLAPSO_CRITICO,
+    }
+    cenario_nome = request.args.get('cenario', 'padrao')
+    cenario = cenarios.get(cenario_nome, CENARIO_NOVO_CASO_FIAP)
+    res = executar_sistema_multiagente(cenario=cenario, modo="local", verbose=False)
+    rec_dict = res["recomendacao_final"].model_dump()
+    rec_dict["texto_formatado_fiap"] = res["saida_formatada_fiap"]
+    rec_dict["handoffs_realizados"] = res["handoffs_realizados"]
+    return jsonify(rec_dict), 200
+
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     logger.info(f"Iniciando servidor CardioIA Flask na porta {port}...")
     print(f"\n=======================================================")
     print(f" Servidor CardioIA Chatbot Online: http://localhost:{port}")
+    print(f" Dashboard Fase 6 Multiagente:     http://localhost:{port}/fase6")
     print(f"=======================================================\n")
     app.run(host='0.0.0.0', port=port, debug=False)

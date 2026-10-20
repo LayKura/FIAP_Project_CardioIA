@@ -11,8 +11,8 @@ INTEGRANTES DO GRUPO:
 1. REPOSITÓRIO GITHUB (CÓDIGO-FONTE, MODELO, MULTIAGENTE E DOCS)
 ---------------------------------------------------------------------
 Link do Repositório GitHub:
-https://github.com/DaviFerreira/Cardio-IA
-(Nota: Substitua pela URL exata do repositório remoto caso diferente)
+https://github.com/Raquerd/FIAP_Project_CardioIA
+
 
 Principais Entregáveis no Repositório:
 - Parte 1 (Modelo Preditivo e Protocolos):
