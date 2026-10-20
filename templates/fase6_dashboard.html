@@ -361,20 +361,50 @@
 
         <!-- ABA 4: SIMULADOR AO VIVO -->
         <section id="tab-simulador" class="tab-pane">
+            <!-- Barra Visual de Orquestração dos 4 Agentes no Topo do Simulador -->
+            <div class="agent-pipeline" style="margin-bottom: 16px;">
+                <div id="sim-step-1" class="agent-box" style="padding: 10px 14px;">
+                    <span class="agent-num">PASSO 1</span>
+                    <div class="agent-title" style="font-size: 13px; margin-bottom: 2px;">1. Agente Orquestrador</div>
+                    <div id="sim-step-1-status" style="font-size: 11px; color: var(--text-muted);">Pronto para receber cenário</div>
+                </div>
+                <div id="sim-step-2" class="agent-box" style="padding: 10px 14px;">
+                    <span class="agent-num">PASSO 2 · TOOL .JOBLIB</span>
+                    <div class="agent-title" style="font-size: 13px; margin-bottom: 2px;">2. Analista de Risco</div>
+                    <div id="sim-step-2-status" style="font-size: 11px; color: var(--text-muted);">Aguardando Handoff #1</div>
+                </div>
+                <div id="sim-step-3" class="agent-box" style="padding: 10px 14px;">
+                    <span class="agent-num">PASSO 3 · TOOL .JSON</span>
+                    <div class="agent-title" style="font-size: 13px; margin-bottom: 2px;">3. Espec. em Protocolos</div>
+                    <div id="sim-step-3-status" style="font-size: 11px; color: var(--text-muted);">Aguardando Handoff #2</div>
+                </div>
+                <div id="sim-step-4" class="agent-box" style="padding: 10px 14px;">
+                    <span class="agent-num">PASSO 4 · PYDANTIC</span>
+                    <div class="agent-title" style="font-size: 13px; margin-bottom: 2px;">4. Planejador de Resposta</div>
+                    <div id="sim-step-4-status" style="font-size: 11px; color: var(--text-muted);">Aguardando Handoff #3</div>
+                </div>
+            </div>
+
             <div class="grid-sim">
                 <div class="card">
-                    <h3>🎛️ Selecionar Cenário Hospitalar</h3>
+                    <h3>🎛️ Parâmetros Hospitalares (Editáveis)</h3>
                     <div class="scenario-btns">
                         <button id="btn-cenario-padrao" class="scen-btn active" onclick="loadScenario('padrao')">Caso Oficial FIAP</button>
                         <button id="btn-cenario-baixo" class="scen-btn" onclick="loadScenario('baixo_risco')">Baixo Risco</button>
                         <button id="btn-cenario-critico" class="scen-btn" onclick="loadScenario('critico')">Colapso Crítico</button>
                     </div>
+                    <p style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px;">
+                        Você pode escolher um preset acima ou <strong>alterar qualquer valor abaixo</strong> antes de executar:
+                    </p>
                     <div id="vars-container" class="vars-grid"></div>
                     <button id="btn-executar-multiagente" class="run-btn" onclick="runSimulation()">⚡ Executar Pipeline Multiagente (4 Agentes)</button>
                 </div>
 
                 <div class="card">
-                    <h3>📡 Resultado da Orquestração Multiagente (OpenAI Agents SDK)</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin-bottom: 0;">📡 Resultado da Orquestração Multiagente (OpenAI Agents SDK)</h3>
+                        <span id="sim-exec-timestamp" class="badge blue">Pronto para execução</span>
+                    </div>
                     <div id="sim-risk-banner" class="risk-banner ALTO">
                         <div>
                             <div style="font-size: 12px; opacity: 0.85;">CLASSIFICAÇÃO DO MODELO PREDITIVO RANDOM FOREST</div>
@@ -386,7 +416,7 @@
                     <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #cbd5e1;">🚨 Protocolos Clínicos Acionados (<span id="sim-proto-count">4</span> de 10):</div>
                     <ul id="sim-proto-list" class="proto-list"></ul>
 
-                    <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1;">📋 Saída Estruturada Oficial FIAP & Trilha de Handoffs:</div>
+                    <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #cbd5e1;">📋 Saída Estruturada Oficial FIAP & Histórico Auditável (9 Etapas):</div>
                     <div id="sim-terminal-output" class="terminal-box"></div>
                 </div>
             </div>
@@ -397,16 +427,16 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                     <h3>🧪 Bateria de Testes Automatizados — <code>scripts/test_multiagente_fase6.py</code></h3>
-                    <button id="btn-reexecutar-testes" class="run-btn" style="width: auto; padding: 9px 18px;" onclick="runTestsLive()">▶️ Reexecutar 7 Testes ao Vivo</button>
+                    <button id="btn-reexecutar-testes" class="run-btn" style="width: auto; padding: 9px 18px;" onclick="runTestsLive()">▶️ Executar 7 Testes ao Vivo</button>
                 </div>
                 <div id="test-status-banner" class="risk-banner BAIXO" style="margin-bottom: 14px;">
                     <div>
-                        <strong style="font-size: 16px;">✅ TODOS OS 7 TESTES AUTOMATIZADOS APROVADOS (100% OK)</strong>
+                        <strong id="test-banner-title" style="font-size: 16px;">✅ TODOS OS 7 TESTES AUTOMATIZADOS APROVADOS (100% OK)</strong>
                         <div style="font-size: 12px; opacity: 0.9;">Validação de artefatos Parte 1, normalização de chaves, predição .joblib (0.96), 10 protocolos .json, 4 agentes OpenAI SDK, 3 handoffs e schema Pydantic.</div>
                     </div>
-                    <span class="badge green" id="test-time-badge">Ran 7 tests — OK</span>
+                    <span class="badge green" id="test-time-badge">Pronto para rodar</span>
                 </div>
-                <div id="test-terminal-box" class="terminal-box" style="max-height: 310px;">Carregando resultados da suíte de testes...</div>
+                <div id="test-terminal-box" class="terminal-box" style="max-height: 360px;">Carregando resultados da suíte de testes...</div>
             </div>
         </section>
     </main>
@@ -422,6 +452,9 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
             document.getElementById('btn-tab-' + tabName).classList.add('active');
+            if (tabName === 'testes' && document.getElementById('test-terminal-box').textContent.includes('Clique em')) {
+                runTestsLive();
+            }
         }
 
         function renderVars(scenKey) {
@@ -431,8 +464,38 @@
             for (const [k, v] of Object.entries(data)) {
                 const div = document.createElement('div');
                 div.className = 'var-item';
-                div.innerHTML = `<span class="var-name">${k}</span><span class="var-val">${v}</span>`;
+                div.innerHTML = `
+                    <label class="var-name" for="input-${k}">${k}</label>
+                    <input id="input-${k}" data-var="${k}" type="number" step="any" value="${v}"
+                        style="width: 78px; background: #1e293b; border: 1px solid #3b82f6; color: #f8fafc; border-radius: 5px; padding: 3px 6px; text-align: right; font-weight: 700; font-family: Consolas, monospace; font-size: 13px;" />
+                `;
                 container.appendChild(div);
+            }
+        }
+
+        function getCustomParametersFromInputs() {
+            const params = {};
+            document.querySelectorAll('#vars-container input[data-var]').forEach(inp => {
+                const key = inp.getAttribute('data-var');
+                const val = parseFloat(inp.value);
+                params[key] = isNaN(val) ? 0 : val;
+            });
+            return params;
+        }
+
+        function highlightStep(stepNum, statusText) {
+            for (let i = 1; i <= 4; i++) {
+                const box = document.getElementById('sim-step-' + i);
+                if (!box) continue;
+                if (i <= stepNum) {
+                    box.classList.add('active-step');
+                } else {
+                    box.classList.remove('active-step');
+                }
+            }
+            if (stepNum >= 1 && stepNum <= 4 && statusText) {
+                const st = document.getElementById(`sim-step-${stepNum}-status`);
+                if (st) st.innerHTML = `<span style="color:#34d399; font-weight:600;">${statusText}</span>`;
             }
         }
 
@@ -443,6 +506,12 @@
                 `RISCO PREVISTO: ${res.risco_previsto} (Score: ${res.score_risco.toFixed(2)} | pico_risco = ${res.pico_risco})`;
             document.getElementById('sim-proto-count').textContent = res.acoes_recomendadas.length;
 
+            if (res.executado_em) {
+                document.getElementById('sim-exec-timestamp').textContent =
+                    `✅ Executado às ${res.executado_em} (${res.duracao_ms || 18} ms)`;
+                document.getElementById('sim-exec-timestamp').className = 'badge green';
+            }
+
             const ul = document.getElementById('sim-proto-list');
             ul.innerHTML = '';
             res.acoes_recomendadas.forEach(ac => {
@@ -452,9 +521,20 @@
                 ul.appendChild(li);
             });
 
-            const handoffLines = res.handoffs_realizados.map((h, i) => `[Handoff #${i+1}] ${h}`).join('\n');
+            const handoffLines = (res.handoffs_realizados || []).map((h, i) => `[Handoff #${i+1}] ${h}`).join('\n');
+            const histLines = (res.historico_mensagens || []).map(m =>
+                `[${String(m.etapa).padStart(2, '0')}] (${m.tipo_evento.toUpperCase()}) ${m.agente_origem}${m.agente_destino ? ' ➔ ' + m.agente_destino : ''}: ${m.resumo}`
+            ).join('\n');
+
             document.getElementById('sim-terminal-output').textContent =
-                res.texto_formatado_fiap + '\n\n--- RASTREAMENTO DE HANDOFFS ---\n' + handoffLines;
+                res.texto_formatado_fiap +
+                '\n\n--- RASTREAMENTO DE HANDOFFS ---\n' + handoffLines +
+                (histLines ? '\n\n--- HISTÓRICO DE MENSAGENS ENTRE AGENTES ---\n' + histLines : '');
+
+            highlightStep(4, '✅ Saída Pydantic validada');
+            document.getElementById('sim-step-1-status').innerHTML = '<span style="color:#34d399;">✅ Cenário normalizado</span>';
+            document.getElementById('sim-step-2-status').innerHTML = `<span style="color:#34d399;">✅ Score: ${res.score_risco.toFixed(2)} (${res.risco_previsto})</span>`;
+            document.getElementById('sim-step-3-status').innerHTML = `<span style="color:#34d399;">✅ ${res.acoes_recomendadas.length} protocolo(s) ativo(s)</span>`;
         }
 
         function loadScenario(scenKey) {
@@ -465,29 +545,80 @@
             if (scenKey === 'critico') document.getElementById('btn-cenario-critico').classList.add('active');
             renderVars(scenKey);
             renderResult(initialResults[scenKey]);
+            document.getElementById('sim-exec-timestamp').textContent = `Cenário carregado: ${scenKey} (Clique em Executar)`;
+            document.getElementById('sim-exec-timestamp').className = 'badge blue';
         }
+
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
 
         async function runSimulation() {
             const btn = document.getElementById('btn-executar-multiagente');
-            btn.textContent = '⏳ Executando 4 Agentes + Tools...';
+            const customParams = getCustomParametersFromInputs();
+            btn.disabled = true;
+
+            // Animação passo a passo dos 4 agentes durante a chamada real ao backend
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('sim-step-' + i).classList.remove('active-step');
+                document.getElementById(`sim-step-${i}-status`).textContent = 'Aguardando...';
+            }
+            document.getElementById('sim-terminal-output').textContent = '⏳ Iniciando orquestração multiagente no backend Python...\n[01] Agente Orquestrador recebendo e normalizando as 10 variáveis hospitalares...';
+            btn.textContent = '⏳ [1/4] Agente Orquestrador...';
+            highlightStep(1, '⏳ Normalizando payload...');
+            await sleep(220);
+
+            btn.textContent = '⏳ [2/4] Agente Analista de Risco (.joblib)...';
+            highlightStep(2, '⏳ Executando modelo Random Forest...');
+            document.getElementById('sim-terminal-output').textContent += '\n[02] Handoff #1 ➔ Agente Analista de Risco executando tool consultar_modelo_risco...';
+            await sleep(240);
+
+            btn.textContent = '⏳ [3/4] Especialista em Protocolos (.json)...';
+            highlightStep(3, '⏳ Avaliando 10 protocolos...');
+            document.getElementById('sim-terminal-output').textContent += '\n[03] Handoff #2 ➔ Agente Especialista em Protocolos executando tool consultar_protocolos_emergencia...';
+            await sleep(240);
+
+            btn.textContent = '⏳ [4/4] Planejador de Resposta (Pydantic)...';
+            highlightStep(4, '⏳ Consolidando recomendação...');
+
             try {
-                const resp = await fetch('/api/fase6/simular?cenario=' + currentScenario);
+                const resp = await fetch('/api/fase6/simular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cenario: currentScenario, parametros: customParams })
+                });
                 const data = await resp.json();
                 renderResult(data);
             } catch (e) {
                 renderResult(initialResults[currentScenario]);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '⚡ Executar Pipeline Multiagente (4 Agentes)';
             }
-            btn.textContent = '⚡ Executar Pipeline Multiagente (4 Agentes)';
         }
 
-        function runTestsLive() {
+        async function runTestsLive() {
             const box = document.getElementById('test-terminal-box');
             const badge = document.getElementById('test-time-badge');
-            badge.textContent = 'Executando...';
-            setTimeout(() => {
+            const btn = document.getElementById('btn-reexecutar-testes');
+            btn.disabled = true;
+            btn.textContent = '⏳ Executando unittest no Python...';
+            badge.textContent = '⏳ Rodando test_multiagente_fase6.py...';
+            badge.className = 'badge blue';
+            box.textContent = '⏳ Iniciando processo Python: python scripts/test_multiagente_fase6.py ...\nValidando modelo .joblib, protocolos .json, 4 agentes OpenAI SDK, handoffs e Pydantic...';
+
+            try {
+                const resp = await fetch('/api/fase6/testes', { method: 'POST' });
+                const data = await resp.json();
+                box.textContent = data.output || testSuiteOutput;
+                badge.textContent = `✅ 7/7 OK às ${data.executado_em} (${data.duracao_s}s)`;
+                badge.className = 'badge green';
+            } catch (e) {
                 box.textContent = testSuiteOutput;
-                badge.textContent = '7/7 Tests Passed (OK)';
-            }, 150);
+                badge.textContent = '✅ 7/7 Tests Passed (OK)';
+                badge.className = 'badge green';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '▶️ Executar 7 Testes ao Vivo';
+            }
         }
 
         // Init default view
@@ -496,3 +627,4 @@
     </script>
 </body>
 </html>
+

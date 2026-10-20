@@ -14,21 +14,23 @@ cls
 echo =======================================================
 echo          CARDIOIA - MENU PRINCIPAL
 echo =======================================================
-echo [1] Executar Sistema Multiagente Preditivo (Fase 6 - OpenAI Agents SDK)
-echo [2] Executar Testes Automatizados do Multiagente (Fase 6)
-echo [3] Iniciar Chatbot Conversacional (Fase 5 - Flask ^& Web)
-echo [4] Executar Testes Automatizados da API (Fase 5)
-echo [5] Iniciar Prototipo de Diagnostico ECG (Fase 4 - Streamlit)
-echo [6] Sair
+echo [1] Executar Sistema Multiagente no Terminal (Fase 6 - CLI)
+echo [2] Abrir Dashboard Web Interativo da Fase 6 (Navegador)
+echo [3] Executar Testes Automatizados do Multiagente (Fase 6)
+echo [4] Iniciar Chatbot Conversacional (Fase 5 - Flask ^& Web)
+echo [5] Executar Testes Automatizados da API (Fase 5)
+echo [6] Iniciar Prototipo de Diagnostico ECG (Fase 4 - Streamlit)
+echo [7] Sair
 echo =======================================================
-set /p OPT="Escolha uma opcao (1-6): "
+set /p OPT="Escolha uma opcao (1-7): "
 
 if "%OPT%"=="1" goto MULTIAGENTE
-if "%OPT%"=="2" goto TESTES_FASE6
-if "%OPT%"=="3" goto CHATBOT
-if "%OPT%"=="4" goto TESTES_FASE5
-if "%OPT%"=="5" goto STREAMLIT
-if "%OPT%"=="6" goto FIM
+if "%OPT%"=="2" goto DASHBOARD_FASE6
+if "%OPT%"=="3" goto TESTES_FASE6
+if "%OPT%"=="4" goto CHATBOT
+if "%OPT%"=="5" goto TESTES_FASE5
+if "%OPT%"=="6" goto STREAMLIT
+if "%OPT%"=="7" goto FIM
 echo Opcao invalida! Tente novamente.
 pause
 cls
@@ -54,6 +56,19 @@ if "%CEN%"=="2" (
 pause
 cls
 goto MENU
+
+:DASHBOARD_FASE6
+cls
+echo =======================================================
+echo Iniciando Dashboard Web Interativo da Fase 6...
+echo Acesso: http://localhost:5000/fase6
+echo =======================================================
+start http://localhost:5000/fase6
+python scripts/app.py
+pause
+cls
+goto MENU
+
 
 :TESTES_FASE6
 cls

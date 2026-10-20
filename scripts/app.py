@@ -162,11 +162,12 @@ def fase6_dashboard():
         CENARIO_BAIXO_RISCO,
         CENARIO_COLAPSO_CRITICO,
         executar_sistema_multiagente,
+        normalizar_cenario,
     )
     cenarios = {
-        "padrao": CENARIO_NOVO_CASO_FIAP,
-        "baixo_risco": CENARIO_BAIXO_RISCO,
-        "critico": CENARIO_COLAPSO_CRITICO,
+        "padrao": normalizar_cenario(CENARIO_NOVO_CASO_FIAP),
+        "baixo_risco": normalizar_cenario(CENARIO_BAIXO_RISCO),
+        "critico": normalizar_cenario(CENARIO_COLAPSO_CRITICO),
     }
     results = {}
     for key, cenario in cenarios.items():
@@ -174,19 +175,12 @@ def fase6_dashboard():
         rec_dict = res["recomendacao_final"].model_dump()
         rec_dict["texto_formatado_fiap"] = res["saida_formatada_fiap"]
         rec_dict["handoffs_realizados"] = res["handoffs_realizados"]
+        rec_dict["historico_mensagens"] = res["historico_mensagens"]
+        rec_dict["cenario_normalizado"] = res["cenario_normalizado"]
         results[key] = rec_dict
 
     test_summary = (
-        "test_01_artefatos_parte1_existem_e_integros ... ok\n"
-        "test_02_normalizacao_chave_disponibilidade_recursos ... ok\n"
-        "test_03_predicao_modelo_novo_caso_fiap (pico_risco=1, score=0.96) ... ok\n"
-        "test_04_protocolos_acionados_novo_caso_fiap (4 protocolos) ... ok\n"
-        "test_05_estrutura_4_agentes_openai_sdk (4 Agentes, 2 Tools, 3 Handoffs, Pydantic) ... ok\n"
-        "test_06_fluxo_completo_multiagente_novo_caso (9 mensagens no histórico) ... ok\n"
-        "test_07_fluxo_cenario_baixo_risco_e_critico (score=0.00 e score=1.00) ... ok\n"
-        "----------------------------------------------------------------------\n"
-        "Ran 7 tests in 0.184s\n\n"
-        "OK — 100% DOS TESTES DA FASE 6 APROVADOS!"
+        "Clique em '▶️ Executar 7 Testes ao Vivo' para rodar a bateria real via Python unittest..."
     )
     return render_template(
         'fase6_dashboard.html',
@@ -196,11 +190,13 @@ def fase6_dashboard():
     )
 
 
-@app.route('/api/fase6/simular', methods=['GET'])
+@app.route('/api/fase6/simular', methods=['GET', 'POST'])
 def api_fase6_simular():
     """
-    Executa ao vivo o pipeline multiagente da Fase 6 para o cenário solicitado.
+    Executa ao vivo o pipeline multiagente da Fase 6 para o cenário selecionado
+    ou com os parâmetros customizados enviados pelo usuário no formulário.
     """
+    from datetime import datetime
     from sistema_multiagente_fase6 import (
         CENARIO_NOVO_CASO_FIAP,
         CENARIO_BAIXO_RISCO,
@@ -212,14 +208,53 @@ def api_fase6_simular():
         "baixo_risco": CENARIO_BAIXO_RISCO,
         "critico": CENARIO_COLAPSO_CRITICO,
     }
-    cenario_nome = request.args.get('cenario', 'padrao')
-    cenario = cenarios.get(cenario_nome, CENARIO_NOVO_CASO_FIAP)
+    if request.method == 'POST':
+        payload = request.get_json(silent=True) or {}
+        cenario = payload.get('parametros') or cenarios.get(payload.get('cenario', 'padrao'), CENARIO_NOVO_CASO_FIAP)
+    else:
+        cenario_nome = request.args.get('cenario', 'padrao')
+        cenario = cenarios.get(cenario_nome, CENARIO_NOVO_CASO_FIAP)
+
+    inicio = datetime.now()
     res = executar_sistema_multiagente(cenario=cenario, modo="local", verbose=False)
+    duracao_ms = round((datetime.now() - inicio).total_seconds() * 1000, 1)
+
     rec_dict = res["recomendacao_final"].model_dump()
     rec_dict["texto_formatado_fiap"] = res["saida_formatada_fiap"]
     rec_dict["handoffs_realizados"] = res["handoffs_realizados"]
+    rec_dict["historico_mensagens"] = res["historico_mensagens"]
+    rec_dict["cenario_normalizado"] = res["cenario_normalizado"]
+    rec_dict["executado_em"] = datetime.now().strftime("%H:%M:%S")
+    rec_dict["duracao_ms"] = duracao_ms
     return jsonify(rec_dict), 200
 
+
+@app.route('/api/fase6/testes', methods=['POST', 'GET'])
+def api_fase6_testes():
+    """
+    Executa ao vivo o script scripts/test_multiagente_fase6.py e retorna o log real.
+    """
+    import subprocess
+    from datetime import datetime
+    script_testes = os.path.join(BASE_DIR, 'test_multiagente_fase6.py')
+    inicio = datetime.now()
+    proc = subprocess.run(
+        [sys.executable, script_testes],
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='replace',
+        timeout=30
+    )
+    duracao_s = round((datetime.now() - inicio).total_seconds(), 2)
+    output_completo = (proc.stdout or "") + ("\n" + proc.stderr if proc.stderr else "")
+    return jsonify({
+        "sucesso": proc.returncode == 0,
+        "returncode": proc.returncode,
+        "duracao_s": duracao_s,
+        "executado_em": datetime.now().strftime("%H:%M:%S"),
+        "output": output_completo.strip()
+    }), 200
 
 
 if __name__ == '__main__':
@@ -230,3 +265,4 @@ if __name__ == '__main__':
     print(f" Dashboard Fase 6 Multiagente:     http://localhost:{port}/fase6")
     print(f"=======================================================\n")
     app.run(host='0.0.0.0', port=port, debug=False)
+
