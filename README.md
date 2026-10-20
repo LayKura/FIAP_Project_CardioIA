@@ -380,3 +380,10 @@ O modelo Random Forest previu classe pico_risco=1 com probabilidade estimada de 
    # Executar os 7 testes automatizados de validação da Fase 6
    python scripts/test_multiagente_fase6.py
    ```
+
+---
+
+### 📹 Vídeo de Demonstração (Fase 6)
+* **Link do Vídeo no YouTube (Não Listado):** **[FIAP - Cardio IA - Fase 6 (https://youtu.be/ZiV1SSPbsR0)](https://youtu.be/ZiV1SSPbsR0)**
+* **Repositório Oficial no GitHub:** **[https://github.com/Raquerd/FIAP_Project_CardioIA](https://github.com/Raquerd/FIAP_Project_CardioIA)**
+

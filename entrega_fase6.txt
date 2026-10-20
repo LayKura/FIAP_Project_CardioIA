@@ -29,7 +29,8 @@ Principais Entregáveis no Repositório:
   * Menu Interativo de Execução: main.bat
 
 ---------------------------------------------------------------------
-2. LINK DO VÍDEO DE DEMONSTRAÇÃO (YOUTUBE - NÃO LISTADO - ATÉ 4 MIN)
+2. LINK DO VÍDEO DE DEMONSTRAÇÃO (YOUTUBE - NÃO LISTADO)
 ---------------------------------------------------------------------
 Link do Vídeo no YouTube:
-[INSERIR_LINK_DO_VIDEO_YOUTUBE_NAO_LISTADO_AQUI]
+https://youtu.be/ZiV1SSPbsR0
+
