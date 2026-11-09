@@ -69,6 +69,32 @@ def get_status():
     }), 200
 
 
+@app.route('/api/ecg/analisar', methods=['POST'])
+def analyze_ecg():
+    if 'image' not in request.files:
+        return jsonify({"erro": "Nenhuma imagem foi enviada."}), 400
+
+    image_file = request.files['image']
+
+    if not image_file.filename:
+        return jsonify({"erro": "Selecione uma imagem para análise."}), 400
+
+    if not image_file.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+        return jsonify({"erro": "Formato inválido. Envie PNG ou JPEG."}), 400
+
+    model_type = request.form.get('model', 'resnet50')
+
+    try:
+        from ecg_inference import analyze_ecg_image
+
+        result = analyze_ecg_image(image_file, model_type)
+        return jsonify({"result": result}), 200
+
+    except Exception as e:
+        logger.exception("Erro ao analisar imagem de ECG")
+        return jsonify({"erro": str(e)}), 500
+
+
 @app.route('/api/session', methods=['POST'])
 def create_session():
     """

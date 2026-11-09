@@ -1,0 +1,13 @@
+Flask
+flask-cors
+python-dotenv
+requests
+gunicorn
+torch
+torchvision
+Pillow
+scikit-learn
+joblib
+pandas
+pydantic
+openai-agents
