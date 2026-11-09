@@ -111,12 +111,27 @@ def load_ecg_model(model_type):
         state_dict = torch.load(
             weights_path,
             map_location=DEVICE,
-            weights_only=True
+            weights_only=True,
+            mmap=True
         )
-    except TypeError:
-        state_dict = torch.load(weights_path, map_location=DEVICE)
+    except (TypeError, RuntimeError):
+        try:
+            state_dict = torch.load(
+                weights_path,
+                map_location=DEVICE,
+                weights_only=True
+            )
+        except TypeError:
+            state_dict = torch.load(
+                weights_path,
+                map_location=DEVICE
+            )
 
-    model.load_state_dict(state_dict)
+    try:
+        model.load_state_dict(state_dict, assign=True)
+    except TypeError:
+        model.load_state_dict(state_dict)
+
     del state_dict
     gc.collect()
 
