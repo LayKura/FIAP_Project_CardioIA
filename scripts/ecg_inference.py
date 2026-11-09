@@ -1,4 +1,5 @@
 import os
+import gc
 import torch
 import torch.nn as nn
 from PIL import Image
@@ -52,10 +53,23 @@ class CNNFromScratch(nn.Module):
         return self.classifier(x)
 
 
-_models = {}
+
+# Mantém somente um modelo carregado por vez para economizar RAM.
+_loaded_model = None
+_loaded_model_key = None
+
+# Reduz o consumo de memória e processamento em servidores pequenos.
+torch.set_num_threads(1)
+
+try:
+    torch.set_num_interop_threads(1)
+except RuntimeError:
+    pass
 
 
 def load_ecg_model(model_type):
+    global _loaded_model, _loaded_model_key
+
     model_type = (model_type or "resnet50").lower()
 
     if model_type in ("cnn", "cnn_scratch", "cnn do zero"):
@@ -63,38 +77,56 @@ def load_ecg_model(model_type):
         weights_path = os.path.join(
             CONFIG_DIR, "cnn_scratch_weights.pth"
         )
-        model = CNNFromScratch()
     elif model_type in ("resnet50", "resnet", "resnet50 (transfer learning)"):
         model_key = "resnet50"
         weights_path = os.path.join(
             CONFIG_DIR, "resnet_transfer_weights.pth"
         )
-        model = resnet50(weights=None)
-        model.fc = nn.Linear(model.fc.in_features, 2)
     else:
         raise ValueError("Modelo selecionado não é válido.")
 
-    if model_key in _models:
-        return _models[model_key]
+    # Reutiliza o modelo se ele já estiver carregado.
+    if _loaded_model is not None and _loaded_model_key == model_key:
+        return _loaded_model
+
+    # Libera o modelo anterior antes de carregar outro.
+    if _loaded_model is not None:
+        del _loaded_model
+        _loaded_model = None
+        _loaded_model_key = None
+        gc.collect()
 
     if not os.path.exists(weights_path):
         raise FileNotFoundError(
             f"Arquivo de pesos não encontrado: {weights_path}"
         )
 
+    if model_key == "cnn":
+        model = CNNFromScratch()
+    else:
+        model = resnet50(weights=None)
+        model.fc = nn.Linear(model.fc.in_features, 2)
+
     try:
         state_dict = torch.load(
-            weights_path, map_location=DEVICE, weights_only=True
+            weights_path,
+            map_location=DEVICE,
+            weights_only=True
         )
     except TypeError:
         state_dict = torch.load(weights_path, map_location=DEVICE)
 
     model.load_state_dict(state_dict)
+    del state_dict
+    gc.collect()
+
     model.to(DEVICE)
     model.eval()
 
-    _models[model_key] = model
-    return model
+    _loaded_model = model
+    _loaded_model_key = model_key
+
+    return _loaded_model
 
 
 def analyze_ecg_image(image_file, model_type="resnet50"):
@@ -103,7 +135,7 @@ def analyze_ecg_image(image_file, model_type="resnet50"):
 
     model = load_ecg_model(model_type)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         outputs = model(image_tensor)
         probabilities = torch.softmax(outputs, dim=1)[0]
 
