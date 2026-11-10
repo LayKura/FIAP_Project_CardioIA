@@ -18,11 +18,14 @@ import {
   Stethoscope,
   ArrowRight,
   X,
+  Trash2,
 } from "lucide-react";
 
 import "./App.css";
+import { supabase } from "./lib/supabase";
 import { checkBackend } from "./services/healthService";
 import { analyzeECG } from "./services/ecgService";
+import { saveExam, getExamHistory, deleteExamHistory } from "./services/historyService";
 
 function App() {
   const [exam, setExam] = useState(null);
@@ -33,6 +36,34 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activePage, setActivePage] = useState("inicio");
+  const [historyItems, setHistoryItems] = useState([]);
+  const [selectedHistory, setSelectedHistory] = useState(null);
+  const [historyImageUrl, setHistoryImageUrl] = useState("");
+  const [session, setSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authMode, setAuthMode] = useState("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) setAuthError(error.message);
+      setSession(data?.session ?? null);
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, currentSession) => {
+        setSession(currentSession);
+        setAuthLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     async function verifyBackend() {
@@ -46,6 +77,76 @@ function App() {
 
     verifyBackend();
   }, []);
+
+  useEffect(() => {
+    getExamHistory()
+      .then(setHistoryItems)
+      .catch(() => {
+        console.error("Não foi possível carregar o histórico.");
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!selectedHistory?.image) {
+      setHistoryImageUrl("");
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(selectedHistory.image);
+    setHistoryImageUrl(imageUrl);
+
+    return () => URL.revokeObjectURL(imageUrl);
+  }, [selectedHistory]);
+
+  async function handleAuthSubmit(event) {
+    event.preventDefault();
+    setAuthError("");
+    setAuthMessage("");
+    setAuthBusy(true);
+
+    try {
+      if (authMode === "signup") {
+        const { data, error } = await supabase.auth.signUp({
+          email: authEmail,
+          password: authPassword,
+        });
+        if (error) throw error;
+
+        if (data.session) {
+          setSession(data.session);
+        } else {
+          setAuthMessage("Conta criada. Confira seu e-mail para confirmar o cadastro antes de entrar.");
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: authEmail,
+          password: authPassword,
+        });
+        if (error) throw error;
+        setSession(data.session);
+      }
+    } catch (err) {
+      setAuthError(err.message || "Não foi possível autenticar. Confira seus dados.");
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
+  async function handleDeleteHistory(id) {
+    const confirmed = window.confirm("Deseja excluir este exame do histórico?");
+    if (!confirmed) return;
+
+    try {
+      await deleteExamHistory(id);
+      setHistoryItems((items) => items.filter((item) => item.id !== id));
+
+      if (selectedHistory?.id === id) {
+        setSelectedHistory(null);
+      }
+    } catch {
+      alert("Não foi possível excluir o exame.");
+    }
+  }
 
   function handleFileChange(event) {
     const file = event.target.files?.[0];
@@ -96,12 +197,33 @@ function App() {
     setResult(null);
 
     try {
-      const data = await analyzeECG(exam, model);
+      const { data: authData, error: authSessionError } = await supabase.auth.getSession();
+      if (authSessionError || !authData.session?.access_token) {
+        throw new Error("Sua sessão expirou. Entre novamente na sua conta.");
+      }
+      const data = await analyzeECG(exam, model, authData.session.access_token);
       setResult(data);
+
+      try {
+        const savedExam = await saveExam({
+          createdAt: new Date().toISOString(),
+          model: data.model || model,
+          classification: data.classification || "Resultado não informado",
+          probabilities: data.probabilities || {},
+          image: exam,
+          fileName: exam.name,
+        });
+
+        setHistoryItems((items) => [savedExam, ...items]);
+      } catch (storageError) {
+        console.error("Erro ao salvar o histórico:", storageError);
+        setError("A análise foi concluída, mas não foi possível salvar o exame no histórico deste navegador.");
+      }
     } catch (err) {
       setError(
         err.response?.data?.erro ||
           err.response?.data?.error ||
+          err.message ||
           "Não foi possível analisar o exame. Verifique se o servidor está funcionando."
       );
     } finally {
@@ -124,6 +246,62 @@ function App() {
     modelos: "Modelos de IA",
     historico: "Histórico",
   };
+
+  if (authLoading) {
+    return <div className="auth-screen"><p>Verificando sua sessão...</p></div>;
+  }
+
+  if (!session) {
+    return (
+      <div className="auth-screen">
+        <form className="auth-card" onSubmit={handleAuthSubmit}>
+          <div className="auth-brand-icon"><HeartPulse size={30} /></div>
+          <h1>CardioIA</h1>
+          <p>{authMode === "login" ? "Entre na sua conta para acessar as análises." : "Crie sua conta para acessar o CardioIA."}</p>
+
+          <label htmlFor="auth-email">E-mail</label>
+          <input
+            id="auth-email"
+            type="email"
+            value={authEmail}
+            onChange={(event) => setAuthEmail(event.target.value)}
+            placeholder="seu@email.com"
+            required
+          />
+
+          <label htmlFor="auth-password">Senha</label>
+          <input
+            id="auth-password"
+            type="password"
+            value={authPassword}
+            onChange={(event) => setAuthPassword(event.target.value)}
+            placeholder="Sua senha"
+            minLength={6}
+            required
+          />
+
+          {authError && <p className="auth-error">{authError}</p>}
+          {authMessage && <p className="auth-message">{authMessage}</p>}
+
+          <button className="auth-submit" type="submit" disabled={authBusy}>
+            {authBusy ? "Aguarde..." : authMode === "login" ? "Entrar" : "Criar conta"}
+          </button>
+
+          <button
+            className="auth-switch"
+            type="button"
+            onClick={() => {
+              setAuthMode(authMode === "login" ? "signup" : "login");
+              setAuthError("");
+              setAuthMessage("");
+            }}
+          >
+            {authMode === "login" ? "Ainda não tem conta? Criar conta" : "Já tem conta? Entrar"}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">
@@ -171,7 +349,6 @@ function App() {
         >
           <History size={19} />
           <span>Histórico</span>
-          <small>Em breve</small>
         </button>
       </nav>  
 
@@ -558,7 +735,7 @@ function App() {
               <div className="confidence-card">
                 <span>Confiança retornada pelo modelo</span>
                 <strong>
-                  {Number(result.confidence ?? 0).toFixed(2)}%
+                  {Math.max(anomaly, normal).toFixed(2)}%
                 </strong>
               </div>
 
@@ -700,28 +877,128 @@ function App() {
           )}
 
           {activePage === "historico" && (
-            <section className="panel coming-soon-panel">
-              <div className="info-icon">
-                <History size={28} />
+            <section className="panel history-panel">
+              <div className="history-heading">
+                <div>
+                  <div className="section-kicker">SEUS REGISTROS</div>
+                  <h1>Histórico de análises</h1>
+                  <p>Consulte os exames analisados neste navegador.</p>
+                </div>
+                <span className="history-count">
+                  {historyItems.length} {historyItems.length === 1 ? "exame" : "exames"}
+                </span>
               </div>
-              <div className="section-kicker">FUNCIONALIDADE EM DESENVOLVIMENTO</div>
-              <h1>Histórico de análises</h1>
-              <p>
-                Aqui ficarão disponíveis os registros das análises
-                realizadas no CardioIA.
-              </p>
-              <p>
-                A funcionalidade de armazenamento e consulta do
-                histórico ainda não foi implementada.
-              </p>
-              <button
-                className="analyze-button"
-                type="button"
-                onClick={() => setActivePage("analise")}
-              >
-                Ir para análise de ECG
-                <ArrowRight size={18} />
-              </button>
+
+              {historyItems.length === 0 ? (
+                <div className="history-empty">
+                  <History size={34} />
+                  <h2>Nenhum exame registrado</h2>
+                  <p>Quando você realizar uma análise, ela aparecerá aqui automaticamente.</p>
+                  <button
+                    className="analyze-button"
+                    type="button"
+                    onClick={() => setActivePage("analise")}
+                  >
+                    Analisar primeiro ECG
+                    <ArrowRight size={18} />
+                  </button>
+                </div>
+              ) : (
+                <div className="history-list">
+                  {historyItems.map((item) => (
+                    <article className="history-item" key={item.id}>
+                      <div className="history-item-main">
+                        <div className="history-item-icon">
+                          <FileImage size={22} />
+                        </div>
+                        <div>
+                          <strong>{item.classification}</strong>
+                          <span>
+                            {new Date(item.createdAt).toLocaleString("pt-BR")}
+                          </span>
+                          <small>
+                            Modelo: {(item.model || "").toUpperCase()}
+                          </small>
+                        </div>
+                      </div>
+                      <div className="history-item-actions">
+                        <button
+                          type="button"
+                          className="history-view-button"
+                          onClick={() => setSelectedHistory(item)}
+                        >
+                          Ver detalhes
+                        </button>
+                        <button
+                          type="button"
+                          className="history-delete-button"
+                          aria-label="Excluir exame"
+                          title="Excluir exame"
+                          onClick={() => handleDeleteHistory(item.id)}
+                        >
+                          <Trash2 size={17} />
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+
+              {selectedHistory && (
+                <div className="history-detail">
+                  <div className="history-detail-heading">
+                    <div>
+                      <div className="section-kicker">DETALHES DO REGISTRO</div>
+                      <h2>{selectedHistory.classification}</h2>
+                      <p>
+                        {new Date(selectedHistory.createdAt).toLocaleString("pt-BR")}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="history-close-button"
+                      onClick={() => setSelectedHistory(null)}
+                      aria-label="Fechar detalhes"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  {historyImageUrl && (
+                    <img
+                      className="history-exam-image"
+                      src={historyImageUrl}
+                      alt="Imagem do eletrocardiograma analisado"
+                    />
+                  )}
+
+                  <p className="history-model">
+                    Modelo utilizado: {(selectedHistory.model || "").toUpperCase()}
+                  </p>
+
+                  <div className="history-probabilities">
+                    <div>
+                      <span>Anomalia (M)</span>
+                      <strong>
+                        {Number(selectedHistory.probabilities?.["Anomalia (M)"] ?? 0).toFixed(2)}%
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Normal (N)</span>
+                      <strong>
+                        {Number(selectedHistory.probabilities?.["Normal (N)"] ?? 0).toFixed(2)}%
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="result-warning">
+                    <AlertCircle size={20} />
+                    <p>
+                      Este resultado é experimental e não constitui diagnóstico médico.
+                    </p>
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
