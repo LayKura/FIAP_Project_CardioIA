@@ -387,3 +387,185 @@ O modelo Random Forest previu classe pico_risco=1 com probabilidade estimada de 
 * **Link do Vídeo no YouTube (Não Listado):** **[FIAP - Cardio IA - Fase 6 (https://youtu.be/ZiV1SSPbsR0)](https://youtu.be/ZiV1SSPbsR0)**
 * **Repositório Oficial no GitHub:** **[https://github.com/Raquerd/FIAP_Project_CardioIA](https://github.com/Raquerd/FIAP_Project_CardioIA)**
 
+---
+
+# Fase 7 – Deploy, Integração Web e Aplicativo Mobile
+
+## 1. Visão geral da entrega
+
+Nesta etapa, o CardioIA foi ampliado com uma aplicação Web e um aplicativo Mobile integrados a um backend responsável pela autenticação e pelo processamento das imagens de eletrocardiograma (ECG).
+
+**Tecnologias utilizadas:**
+
+| Componente | Tecnologia |
+|---|---|
+| Frontend Web | React e Vite |
+| Aplicativo Mobile | React Native e Expo |
+| Backend | Python e Flask |
+| Servidor WSGI | Gunicorn |
+| Inteligência artificial | CNN e ResNet50 |
+| Autenticação | Supabase |
+| Histórico Web | IndexedDB |
+| Hospedagem Web | Vercel |
+| Hospedagem do backend | AWS Elastic Beanstalk |
+| Build Mobile | Expo Application Services (EAS) |
+
+## 2. Links para avaliação
+
+- **Repositório desta entrega:** https://github.com/LayKura/FIAP_Project_CardioIA
+- **Aplicação Web publicada:** https://fiap-project-cardio-ia-delta.vercel.app
+- **Aplicativo Android (APK):** [Baixar CardioIA](https://expo.dev/artifacts/eas/5-zVREEnJZ6c7p0Ryhjkn65hlqBnIuC4IfWS9qX_5JI.apk)
+- **Página do build Android:** https://expo.dev/accounts/laykura/projects/cardioia-mobile/builds/bec043dd-a8f5-4523-a9f0-71fb93159489
+- **Projeto Mobile no Expo:** https://expo.dev/accounts/laykura/projects/cardioia-mobile
+
+## 3. Aplicação Web
+
+A aplicação Web está publicada na Vercel:
+
+https://fiap-project-cardio-ia-delta.vercel.app
+
+O frontend permite realizar autenticação, selecionar imagens de ECG, escolher o modelo de inteligência artificial e visualizar os resultados retornados pelo backend.
+
+O histórico da aplicação Web utiliza IndexedDB, armazenando as análises localmente no navegador.
+
+O arquivo `web/vercel.json` configura o encaminhamento das requisições destinadas à API para o backend hospedado na AWS e o fallback para as rotas da aplicação frontend.
+
+## 4. Backend e infraestrutura AWS
+
+O backend foi desenvolvido em Flask e hospedado no AWS Elastic Beanstalk.
+
+- Aplicação: `cardioia`
+- Ambiente: `cardioia-env`
+- Região: `us-east-2` (Ohio)
+
+**Endpoint base:**
+
+http://cardioia-env.eba-unfydca4.us-east-2.elasticbeanstalk.com
+
+Entre as rotas disponibilizadas estão:
+
+| Método | Rota | Finalidade |
+|---|---|---|
+| GET | `/api/status` | Verificar a disponibilidade da API |
+| POST | `/api/ecg/analisar` | Receber a imagem e executar a análise do ECG |
+
+A rota de análise exige autenticação por token Bearer do Supabase, recebe a imagem por multipart/form-data e permite selecionar o modelo `cnn` ou `resnet50`.
+
+O resultado contém a classificação e as probabilidades calculadas pelo modelo utilizado.
+
+O arquivo `Procfile` configura a inicialização do backend com Gunicorn.
+
+## 5. Aplicativo Mobile
+
+O aplicativo foi desenvolvido com React Native e Expo.
+
+- Nome: CardioIA
+- Identificador Android: `br.com.cardioia.mobile`
+- Projeto Expo: `cardioia-mobile`
+
+### Funcionalidades
+
+- Cadastro e autenticação de usuários.
+- Persistência da sessão com Supabase.
+- Seleção de imagens de ECG na galeria do dispositivo.
+- Seleção entre os modelos CNN e ResNet50.
+- Envio da imagem ao backend autenticado.
+- Exibição da classificação e das probabilidades retornadas pela API.
+- Navegação entre as telas de início, análise, histórico e conta.
+
+O envio da imagem utiliza `expo-file-system/legacy`, com requisição multipart/form-data e token de acesso no cabeçalho `Authorization`.
+
+### Build Android
+
+O APK foi gerado pelo Expo Application Services (EAS), utilizando o perfil `preview`, com distribuição interna.
+
+Para gerar um novo APK:
+
+```bash
+cd mobile
+npm install
+npx eas-cli build --platform android --profile preview
+```
+
+A configuração de build está em `mobile/eas.json`, e os dados do aplicativo estão em `mobile/app.json`.
+
+## 6. Autenticação e variáveis de ambiente
+
+O Supabase é utilizado para autenticação dos usuários.
+
+### Aplicativo Mobile
+
+As seguintes variáveis são utilizadas:
+
+| Variável | Finalidade |
+|---|---|
+| `EXPO_PUBLIC_API_URL` | Endereço base da API |
+| `EXPO_PUBLIC_SUPABASE_URL` | Endereço do projeto Supabase |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave publicável do Supabase |
+
+### Backend
+
+| Variável | Finalidade |
+|---|---|
+| `SUPABASE_URL` | Endereço do projeto Supabase |
+| `SUPABASE_PUBLISHABLE_KEY` | Chave utilizada na validação da autenticação |
+| `PORT` | Porta de execução do servidor |
+
+As variáveis devem ser configuradas no ambiente de execução correspondente. Arquivos `.env` com valores locais não devem ser versionados.
+
+## 7. Histórico de análises
+
+Na aplicação Web, as análises são armazenadas localmente no navegador por meio do IndexedDB.
+
+No aplicativo Mobile, a tela de histórico consulta os registros da tabela `exams` no Supabase. O fluxo atual de análise Mobile, entretanto, não grava automaticamente o resultado nessa tabela. Portanto, os históricos Web e Mobile não são sincronizados nesta versão.
+
+## 8. Execução local
+
+### Backend
+
+Na raiz do repositório:
+
+```bash
+pip install -r requirements-backend.txt
+python scripts/app.py
+```
+
+Configure as variáveis de ambiente necessárias antes de iniciar o backend.
+
+### Frontend Web
+
+Em outro terminal:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Para gerar a versão de produção:
+
+```bash
+npm run build
+```
+
+### Aplicativo Mobile
+
+Em outro terminal:
+
+```bash
+cd mobile
+npm install
+npx expo start
+```
+
+Para gerar o APK Android, consulte o comando apresentado na seção de build.
+
+## 9. Segurança e limitações
+
+- As rotas protegidas da API validam o token de autenticação do Supabase.
+- Credenciais e arquivos `.env` não devem ser publicados no repositório.
+- A comunicação configurada entre a Vercel e o backend AWS utiliza HTTP, não HTTPS de ponta a ponta.
+- O histórico Web é local ao navegador; o histórico Mobile consulta o Supabase, sem gravação automática pelo fluxo atual de análise.
+- Os modelos e resultados apresentados fazem parte de um protótipo acadêmico, sem validação clínica para utilização diagnóstica.
+
+**Aviso:** o CardioIA é um projeto acadêmico e experimental. Seus resultados não substituem avaliação médica e não devem ser utilizados isoladamente para decisões clínicas.
