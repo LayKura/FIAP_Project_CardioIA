@@ -412,10 +412,9 @@ Nesta etapa, o CardioIA foi ampliado com uma aplicação Web e um aplicativo Mob
 
 ## 2. Links para avaliação
 
-- **Repositório desta entrega:** https://github.com/LayKura/FIAP_Project_CardioIA
 - **Aplicação Web publicada:** https://fiap-project-cardio-ia-delta.vercel.app
-- **Aplicativo Android (APK):** [Baixar CardioIA](https://expo.dev/artifacts/eas/5-zVREEnJZ6c7p0Ryhjkn65hlqBnIuC4IfWS9qX_5JI.apk)
-- **Página do build Android:** https://expo.dev/accounts/laykura/projects/cardioia-mobile/builds/bec043dd-a8f5-4523-a9f0-71fb93159489
+- **Aplicativo Android (APK):** [[Baixar CardioIA](https://expo.dev/artifacts/eas/5-zVREEnJZ6c7p0Ryhjkn65hlqBnIuC4IfWS9qX_5JI.apk)](https://expo.dev/accounts/laykura/projects/cardioia-mobile/builds/c17470c5-3da4-40c6-aa25-ef0d2f3db23c)
+  <img width="612" height="568" alt="image" src="https://github.com/user-attachments/assets/98f597c5-0cad-423b-8cf1-ea5df125deea" />
 - **Projeto Mobile no Expo:** https://expo.dev/accounts/laykura/projects/cardioia-mobile
 
 ## 3. Aplicação Web
@@ -488,6 +487,21 @@ npx eas-cli build --platform android --profile preview
 ```
 
 A configuração de build está em `mobile/eas.json`, e os dados do aplicativo estão em `mobile/app.json`.
+
+### Como baixar o CardioIA
+
+**Requisitos:** celular com sistema Android e conexão com a internet.
+
+1. Abra o link **Baixar CardioIA (APK)** pelo navegador do celular.
+2. Toque em **Baixar** para fazer o download do aplicativo.
+3. Aguarde o download terminar.
+4. Abra o arquivo baixado, chamado CardioIA.apk ou semelhante.
+5. Se o Android exibir um aviso de segurança, toque em **Configurações** e permita a instalação de aplicativos dessa fonte (por exemplo, Chrome).
+6. Volte para a tela de instalação e toque em **Instalar**.
+7. Quando a instalação terminar, toque em **Abrir**.
+8. Faça login ou crie uma conta para começar a utilizar o CardioIA.
+
+**Observação:** o aplicativo é distribuído por arquivo APK, fora da Google Play Store. Por isso, o Android poderá solicitar autorização para instalar aplicativos de fontes externas.
 
 ## 6. Autenticação e variáveis de ambiente
 
@@ -574,18 +588,27 @@ Para gerar o APK Android, consulte o comando apresentado na seção de build.
 
 ### Aplicação Web
 
-[Tela inicial Web]
+<img width="2940" height="1660" alt="image" src="https://github.com/user-attachments/assets/d5404080-b0b4-409f-9a38-9f3dc90e5583" />
 
-[Resultado da análise Web]
+<img width="2940" height="1662" alt="image" src="https://github.com/user-attachments/assets/1622c705-e6ad-4385-bfb8-c4f33d36086c" />
+
+<img width="2430" height="1144" alt="image" src="https://github.com/user-attachments/assets/85ec2999-0d62-4cbc-ae56-6095f208ac31" />
+
+<img width="2940" height="1650" alt="image" src="https://github.com/user-attachments/assets/a3d59224-ab24-4885-9d0a-205e23ed19bd" />
 
 ### Aplicativo Mobile
 
-[Tela inicial Mobile]
+<img width="738" height="1600" alt="image" src="https://github.com/user-attachments/assets/f4480661-0208-454f-a6c5-d20c8ca7d8e9" />
 
-[Resultado da análise Mobile]
+<img width="738" height="1600" alt="image" src="https://github.com/user-attachments/assets/12e6e2dc-82f9-443d-8daa-197d04aa5696" />
+
+<img width="738" height="1600" alt="image" src="https://github.com/user-attachments/assets/18b32f0a-5ea6-4ffe-a823-f40f6b4cbfe6" />
 
 ### Infraestrutura
 
-[Deploy na Vercel]
+<img width="2940" height="1658" alt="image" src="https://github.com/user-attachments/assets/3ebe35a9-b2a7-4a41-9fc7-8459cda82abd" />
 
-[Ambiente AWS]
+<img width="2940" height="1430" alt="image" src="https://github.com/user-attachments/assets/f6e3f505-8f0e-47d9-bc06-edb83a2724ec" />
+
+<img width="2514" height="1478" alt="image" src="https://github.com/user-attachments/assets/55c268f3-f94d-4a8b-8c88-fab993016185" />
+
