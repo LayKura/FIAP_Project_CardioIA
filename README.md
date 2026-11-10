@@ -569,3 +569,23 @@ Para gerar o APK Android, consulte o comando apresentado na seção de build.
 - Os modelos e resultados apresentados fazem parte de um protótipo acadêmico, sem validação clínica para utilização diagnóstica.
 
 **Aviso:** o CardioIA é um projeto acadêmico e experimental. Seus resultados não substituem avaliação médica e não devem ser utilizados isoladamente para decisões clínicas.
+
+## 10. Demonstração da aplicação
+
+### Aplicação Web
+
+[Tela inicial Web]
+
+[Resultado da análise Web]
+
+### Aplicativo Mobile
+
+[Tela inicial Mobile]
+
+[Resultado da análise Mobile]
+
+### Infraestrutura
+
+[Deploy na Vercel]
+
+[Ambiente AWS]
